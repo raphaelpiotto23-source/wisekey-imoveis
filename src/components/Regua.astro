@@ -1,0 +1,16 @@
+---
+// Régua da faixa do bairro: P25 a P75, mediana e, se houver, o ponto do imóvel.
+const { p25, p75, mediana, valor, rotulo = 'Este imóvel' } = Astro.props;
+const lo = Math.min(p25, valor ?? p25) * 0.85;
+const hi = Math.max(p75, valor ?? p75) * 1.12;
+const pos = (v) => `${(((v - lo) / (hi - lo)) * 100).toFixed(1)}%`;
+const fmt = (v) => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+---
+<div class="regua" role="img" aria-label={`Faixa do bairro de ${fmt(p25)} a ${fmt(p75)} por m², mediana ${fmt(mediana)}${valor ? `. ${rotulo}: ${fmt(valor)} por m²` : ''}`}>
+  <div class="barra">
+    <span class="faixa-r" style={`left:${pos(p25)};width:calc(${pos(p75)} - ${pos(p25)})`}></span>
+    <span class="med" style={`left:${pos(mediana)}`}></span>
+    {valor && <span class="ponto" style={`left:${pos(valor)}`}></span>}
+  </div>
+  <div class="legenda"><span>{fmt(p25)}/m²</span><span>mediana {fmt(mediana)}/m²</span><span>{fmt(p75)}/m²</span></div>
+</div>

@@ -1,0 +1,11 @@
+---
+import Base from '../layouts/Base.astro';
+import { u } from '../lib/imoveis.js';
+---
+<Base title="Página não encontrada | Wisekey Imóveis" description="Página não encontrada.">
+  <section class="sec topo-curto"><div class="wrap estreito">
+    <h1 class="titulo menor">Essa página não existe mais.</h1>
+    <p class="lede">O imóvel pode ter sido vendido ou retirado. Veja o que está à venda agora.</p>
+    <div class="btns" style="margin-top:24px"><a class="btn" href={u('/imoveis/')}>Ver imóveis</a><a class="btn cont" href={u('/')}>Ir para o início</a></div>
+  </div></section>
+</Base>

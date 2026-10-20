@@ -1,0 +1,77 @@
+---
+import Base from '../../layouts/Base.astro';
+import CardImovel from '../../components/CardImovel.astro';
+import { listarImoveis, TIPO, u } from '../../lib/imoveis.js';
+const imoveis = await listarImoveis();
+const bairros = [...new Set(imoveis.map((i) => i.data.bairro))].sort();
+const tipos = [...new Set(imoveis.map((i) => i.data.tipo))];
+---
+<Base title="Imóveis à venda em São João da Boa Vista | Wisekey Imóveis" description="Casas, apartamentos e terrenos à venda em São João da Boa Vista, SP. Preço sempre público e comparado com o bairro." atual="imoveis">
+  <section class="sec topo-curto">
+    <div class="wrap">
+      <h1 class="titulo menor">Imóveis à venda<br /><span class="it">em São João.</span></h1>
+      {imoveis.length === 0 ? (
+        <div class="vazio">
+          <h2 style="font-size:1.4rem">Os primeiros imóveis entram em breve</h2>
+          <p class="cinza-t" style="margin-top:10px">Conta o que você procura. A gente vai atrás do imóvel certo.</p>
+          <a class="btn" href={u('/procuro/')}>Dizer o que procuro</a>
+        </div>
+      ) : (
+        <>
+          <form class="filtros" id="filtros" aria-label="Filtrar imóveis">
+            <label class="sr" for="f-tipo">Tipo</label>
+            <select id="f-tipo" name="tipo"><option value="">Tipo</option>{tipos.map((t) => <option value={t}>{TIPO[t]}</option>)}</select>
+            <label class="sr" for="f-bairro">Bairro</label>
+            <select id="f-bairro" name="bairro"><option value="">Bairro</option>{bairros.map((b) => <option value={b}>{b}</option>)}</select>
+            <label class="sr" for="f-preco">Valor máximo</label>
+            <select id="f-preco" name="preco"><option value="">Valor</option><option value="300000">Até R$ 300 mil</option><option value="500000">Até R$ 500 mil</option><option value="900000">Até R$ 900 mil</option><option value="1500000">Até R$ 1,5 milhão</option></select>
+            <label class="sr" for="f-area">Metragem mínima</label>
+            <select id="f-area" name="area"><option value="">Metragem</option><option value="50">50 m² ou mais</option><option value="100">100 m² ou mais</option><option value="200">200 m² ou mais</option><option value="300">300 m² ou mais</option></select>
+            <label class="sr" for="f-quartos">Quartos</label>
+            <select id="f-quartos" name="quartos"><option value="">Quartos</option><option value="1">1 ou mais</option><option value="2">2 ou mais</option><option value="3">3 ou mais</option><option value="4">4 ou mais</option></select>
+            <label class="sr" for="f-codigo">Código</label>
+            <input id="f-codigo" name="codigo" placeholder="Código" autocomplete="off" />
+            <label class="sr" for="f-ordem">Ordenar</label>
+            <select id="f-ordem" name="ordem" class="ordem"><option value="dif">Mais abaixo do bairro</option><option value="menor">Menor preço</option><option value="maior">Maior preço</option></select>
+          </form>
+          <div class="res"><span id="contagem" aria-live="polite">{imoveis.length} {imoveis.length === 1 ? 'imóvel' : 'imóveis'}</span><a class="nota" href={u('/procuro/')}>Não achou? Diga o que procura</a></div>
+          <div class="grade" id="lista">{imoveis.map((i, k) => <CardImovel imovel={i} carregar={k < 3 ? 'eager' : 'lazy'} />)}</div>
+        </>
+      )}
+    </div>
+  </section>
+</Base>
+<script>
+  function filtros() {
+    const f = document.getElementById('filtros') as HTMLFormElement | null;
+    if (!f || f.dataset.ok) return;
+    f.dataset.ok = '1';
+    const lista = document.getElementById('lista')!;
+    const cards = [...lista.querySelectorAll<HTMLElement>('.card')];
+    const out = document.getElementById('contagem')!;
+    const q = new URLSearchParams(location.search);
+    f.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[name]').forEach((el) => { const v = q.get(el.name); if (v) el.value = v; });
+    const aplicar = () => {
+      const v = Object.fromEntries(new FormData(f)) as Record<string, string>;
+      const cod = (v.codigo || '').trim().toLowerCase();
+      let n = 0;
+      cards.forEach((c) => {
+        const d = c.dataset;
+        const ok = (!v.tipo || d.tipo === v.tipo) && (!v.bairro || d.bairro === v.bairro) &&
+          (!v.preco || +d.preco! <= +v.preco) && (!v.area || +d.area! >= +v.area) &&
+          (!v.quartos || +d.quartos! >= +v.quartos) && (!cod || d.codigo!.includes(cod));
+        c.hidden = !ok;
+        if (ok) n++;
+      });
+      const chave = v.ordem === 'menor' ? (c: HTMLElement) => +c.dataset.preco! : v.ordem === 'maior' ? (c: HTMLElement) => -c.dataset.preco! : (c: HTMLElement) => +c.dataset.dif!;
+      [...cards].sort((a, b) => chave(a) - chave(b)).forEach((c) => lista.appendChild(c));
+      out.textContent = n === 0 ? 'Nenhum imóvel com esse filtro' : `${n} ${n === 1 ? 'imóvel' : 'imóveis'}`;
+    };
+    f.addEventListener('change', aplicar);
+    f.addEventListener('input', aplicar);
+    f.addEventListener('submit', (e) => e.preventDefault());
+    aplicar();
+  }
+  filtros();
+  document.addEventListener('astro:page-load', filtros);
+</script>

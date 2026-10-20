@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import FormWhats from '../components/FormWhats.astro';
+import { listaBairros } from '../lib/imoveis.js';
+const bairros = ['Qualquer bairro', ...listaBairros().map((b) => b.nome).sort()];
+const campos = [
+  { nome: 'tipo', rotulo: 'O que você procura', opcoes: ['Casa', 'Casa em condomínio', 'Apartamento', 'Terreno', 'Chácara'], obrigatorio: true },
+  { nome: 'bairro', rotulo: 'Bairro de preferência', opcoes: bairros },
+  { nome: 'preco', rotulo: 'Até quanto', opcoes: ['R$ 300 mil', 'R$ 500 mil', 'R$ 800 mil', 'R$ 1,2 milhão', 'R$ 2 milhões', 'Acima de R$ 2 milhões'], obrigatorio: true },
+  { nome: 'quartos', rotulo: 'Quartos', opcoes: ['1', '2', '3', '4 ou mais'] },
+  { nome: 'prazo', rotulo: 'Para quando', opcoes: ['Agora', 'Nos próximos 3 meses', 'Ainda pesquisando'] },
+  { nome: 'nome', rotulo: 'Seu nome', exemplo: 'João', obrigatorio: true },
+];
+---
+<Base title="Procuro imóvel em São João da Boa Vista | Wisekey Imóveis" description="Diga que imóvel você procura em São João da Boa Vista. A gente busca, inclusive o que ainda não foi anunciado." atual="procuro">
+  <section class="sec topo-curto">
+    <div class="wrap estreito">
+            <h1 class="titulo menor">Diga o que você procura. <span class="it cinza-t">A gente vai atrás.</span></h1>
+      <p class="lede">Nem todo imóvel à venda está anunciado. Com o seu pedido na mão, a gente fala com os donos certos.</p>
+      <div style="margin-top:32px">
+        <FormWhats id="f-procuro" intro="Olá! Estou procurando um imóvel em São João." botao="Enviar meu pedido" campos={campos} />
+      </div>
+    </div>
+  </section>
+</Base>

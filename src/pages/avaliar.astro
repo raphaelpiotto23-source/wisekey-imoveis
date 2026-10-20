@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+import FormWhats from '../components/FormWhats.astro';
+import { listaBairros } from '../lib/imoveis.js';
+const bairros = [...listaBairros().map((b) => b.nome).sort(), 'Outro bairro'];
+const campos = [
+  { nome: 'tipo', rotulo: 'Tipo do imóvel', opcoes: ['Casa', 'Apartamento', 'Terreno', 'Chácara', 'Comercial'], obrigatorio: true },
+  { nome: 'bairro', rotulo: 'Bairro', opcoes: bairros, obrigatorio: true },
+  { nome: 'construida', rotulo: 'Área construída (m²)', tipo: 'number', exemplo: '120' },
+  { nome: 'terreno', rotulo: 'Área do terreno (m²)', tipo: 'number', exemplo: '250' },
+  { nome: 'quartos', rotulo: 'Quartos', opcoes: ['1', '2', '3', '4 ou mais'] },
+  { nome: 'suites', rotulo: 'Suítes', opcoes: ['Nenhuma', '1', '2', '3 ou mais'] },
+  { nome: 'nome', rotulo: 'Seu nome', exemplo: 'Maria', obrigatorio: true },
+];
+---
+<Base title="Quanto vale o meu imóvel em São João da Boa Vista | Wisekey Imóveis" description="Peça a avaliação do seu imóvel em São João da Boa Vista. Faixa do bairro na hora e laudo pelo método comparativo." atual="avaliar">
+  <section class="sec topo-curto">
+    <div class="wrap estreito">
+            <h1 class="titulo menor">Seu imóvel vale o que o dado diz. <span class="it cinza-t">Não o que o vizinho pediu.</span></h1>
+      <p class="lede">Conta como é o imóvel. A gente cruza com os anúncios do bairro e devolve uma faixa de valor. Se quiser o número exato, ele vem no laudo.</p>
+      <div style="margin-top:32px">
+        <FormWhats id="f-avaliar" intro="Olá! Quero avaliar meu imóvel." botao="Pedir avaliação" campos={campos} />
+      </div>
+      <h2 style="margin-top:56px;font-size:1.35rem;margin-bottom:12px">O que vem no laudo</h2>
+      <ul class="lista">
+        <li>Visita ao imóvel e conferência das áreas.</li>
+        <li>Imóveis comparáveis do bairro, com fonte e data.</li>
+        <li>Valor defendido pelo método comparativo, conforme a NBR 14653.</li>
+      </ul>
+      <p>Avaliar não obriga a vender com a gente.</p>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,46 @@
+---
+import Base from '../../layouts/Base.astro';
+import { listaBairros, brl, u } from '../../lib/imoveis.js';
+const bairros = listaBairros();
+const cel = (b, t) => (b.tipos[t] ? brl(b.tipos[t].m2_mediana) : '·');
+---
+<Base title="Preço do m² por bairro em São João da Boa Vista | Wisekey Imóveis" description={`Quanto custa o m² em ${bairros.length} bairros de São João da Boa Vista: casa, apartamento e terreno, com a faixa de preço de cada bairro.`} atual="bairros">
+  <section class="sec topo-curto">
+    <div class="wrap">
+      <div class="par">
+        <h1 class="titulo menor">Quanto custa o m²<br /><span class="it">em cada bairro.</span></h1>
+        <p class="txt">Mediana do preço pedido nos anúncios de {bairros.length} bairros de São João. Toque no bairro para ver a faixa completa. <strong>Preço de anúncio, não de fechamento.</strong></p>
+      </div>
+      <div class="busca-b"><label class="sr" for="busca">Buscar bairro</label><input id="busca" type="search" placeholder="Buscar bairro" autocomplete="off" /></div>
+      <div style="overflow-x:auto;margin-top:20px">
+        <table class="tabela-b" id="tabela">
+          <caption class="sr">Preço mediano do m² por bairro e tipo</caption>
+          <thead><tr><th scope="col">Bairro</th><th scope="col">Casa</th><th scope="col">Apto.</th><th scope="col">Terreno</th><th scope="col">Anúncios</th></tr></thead>
+          <tbody>
+            {bairros.map((b) => (
+              <tr data-nome={b.chave}>
+                <td><a href={u(`/bairros/${b.slug}/`)}>{b.nome}</a></td>
+                <td>{cel(b, 'casa')}</td><td>{cel(b, 'apartamento')}</td><td>{cel(b, 'terreno')}</td><td>{b.anuncios_total}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="nota" style="margin-top:18px">Casa e apartamento: por m² construído. Terreno: por m² de terreno. O ponto aparece quando o bairro tem menos de 5 anúncios daquele tipo. Fonte: rede parceira local, coleta de ago/2026.</p>
+    </div>
+  </section>
+</Base>
+<script>
+  function busca() {
+    const i = document.getElementById('busca') as HTMLInputElement | null;
+    if (!i || i.dataset.ok) return;
+    i.dataset.ok = '1';
+    const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    i.addEventListener('input', () => {
+      const q = norm(i.value);
+      document.querySelectorAll<HTMLElement>('#tabela tbody tr').forEach((tr) => { tr.hidden = !!q && !tr.dataset.nome!.includes(q); });
+    });
+  }
+  busca();
+  document.addEventListener('astro:page-load', busca);
+</script>

@@ -1,0 +1,103 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+import Icones from '../components/Icones.astro';
+import site from '../data/site.json';
+import { MODO_DEMO, wa, u } from '../lib/imoveis.js';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  jsonld?: object;
+  atual?: string;
+  comFixo?: boolean;
+}
+const { title, description, image, jsonld, atual, comFixo = false } = Astro.props;
+const raiz = Astro.site ?? new URL(site.url);
+const canonical = new URL(Astro.url.pathname, raiz).href;
+const og = new URL(image ?? u('/img/og.png'), raiz).href;
+const org = {
+  '@context': 'https://schema.org',
+  '@type': 'RealEstateAgent',
+  name: site.nome,
+  url: site.url,
+  address: { '@type': 'PostalAddress', streetAddress: 'Rua Inocêncio Papiani, 400, sala 2', addressLocality: 'São João da Boa Vista', addressRegion: 'SP', addressCountry: 'BR' },
+  areaServed: 'São João da Boa Vista, SP',
+};
+const links = [
+  { href: u('/imoveis/'), txt: 'Imóveis', id: 'imoveis' },
+  { href: u('/bairros/'), txt: 'Bairros', id: 'bairros' },
+  { href: u('/procuro/'), txt: 'Procuro um imóvel', id: 'procuro' },
+  { href: u('/#como'), txt: 'Como trabalhamos', id: 'como' },
+];
+---
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  {MODO_DEMO && <meta name="robots" content="noindex, nofollow" />}
+  <meta name="theme-color" content="#FFFFFF" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:site_name" content={site.nome} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={og} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href={u('/img/favicon.svg')} type="image/svg+xml" />
+  <link rel="icon" href={u('/img/favicon-32.png')} sizes="32x32" />
+  <link rel="apple-touch-icon" href={u('/img/apple-touch-icon.png')} />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonld ?? org)} />
+  <ClientRouter />
+</head>
+<body class={comFixo ? 'com-fixo' : undefined}>
+  <Icones />
+  {MODO_DEMO && <div class="demo-faixa">Preview com imóveis de exemplo. Nada nesta versão é anúncio real.</div>}
+  <header class="topo" id="topo" transition:persist>
+    <div class="wrap">
+      <a class="logo" href={u('/')} aria-label="Wisekey Imóveis, início"><img src={u('/img/wisekey.svg')} alt="wisekey" width="99" height="28" /><span>imóveis</span></a>
+      <div class="menu">
+        <nav aria-label="Principal" style="display:contents">
+          {links.map((l) => <a class="ml" href={l.href} aria-current={atual === l.id ? 'page' : undefined}>{l.txt}</a>)}
+        </nav>
+        <a class="btn" href={u('/avaliar/')}><span>Avaliar<span class="lg"> meu imóvel</span></span></a>
+        <details class="gaveta">
+          <summary aria-label="Abrir menu"><i></i><i></i><i></i></summary>
+          <nav aria-label="Menu">
+            {links.map((l) => <a href={l.href}>{l.txt}</a>)}
+            <a href={u('/avaliar/')}>Avaliar meu imóvel</a>
+          </nav>
+        </details>
+      </div>
+    </div>
+  </header>
+  <main><slot /></main>
+  <footer class="rodape">
+    <div class="wrap">
+      <div class="cols">
+        <div><img src={u('/img/wisekey-claro.svg')} alt="wisekey" width="99" height="28" style="margin-bottom:14px" />Imobiliária em São João da Boa Vista.<br />{site.endereco}</div>
+        <div><b>Imóveis</b><a href={u('/imoveis/?tipo=casa')}>Casas à venda</a><a href={u('/imoveis/?tipo=apartamento')}>Apartamentos à venda</a><a href={u('/imoveis/?tipo=terreno')}>Terrenos à venda</a></div>
+        <div><b>Bairros</b><a href={u('/bairros/centro/')}>Centro</a><a href={u('/bairros/terras-de-sao-jose/')}>Terras de São José</a><a href={u('/bairros/recanto-do-bosque/')}>Recanto do Bosque</a><a href={u('/bairros/')}>Todos os bairros</a></div>
+        <div><b>Para você</b><a href={u('/avaliar/')}>Avaliar meu imóvel</a><a href={u('/procuro/')}>Procuro um imóvel</a><a href={wa('Olá! Vim pelo site da Wisekey Imóveis.')}>Falar no WhatsApp</a></div>
+      </div>
+      <div class="base"><span>{site.creci_pj} · Responsável técnico: {site.responsavel}</span><span>A chave para o endereço certo.</span></div>
+    </div>
+  </footer>
+  <a class="flutua" href={wa('Olá! Vim pelo site da Wisekey Imóveis.')} aria-label="Falar no WhatsApp"><svg><use href="#i-wa" /></svg></a>
+  <script>
+    let y0 = 0;
+    const topo = () => document.getElementById('topo');
+    addEventListener('scroll', () => {
+      const y = scrollY, t = topo();
+      if (t) t.classList.toggle('oculto', y > y0 && y > 300 && !t.querySelector('details[open]'));
+      y0 = y;
+    }, { passive: true });
+  </script>
+</body>
+</html>

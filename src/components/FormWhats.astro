@@ -1,0 +1,44 @@
+---
+// Formulário que vira mensagem pronta no WhatsApp. Sem servidor: o texto é montado no navegador.
+import site from '../data/site.json';
+const { id, intro, campos, botao } = Astro.props;
+---
+<form class="form" id={id} data-wa={site.whatsapp} data-intro={intro} action={`https://wa.me/${site.whatsapp}`} method="get">
+  {campos.map((c) => (
+    <label>
+      {c.rotulo}
+      {c.opcoes ? (
+        <select name={c.nome} required={c.obrigatorio}>
+          <option value="">Escolha</option>
+          {c.opcoes.map((o) => <option value={o}>{o}</option>)}
+        </select>
+      ) : (
+        <input name={c.nome} type={c.tipo ?? 'text'} inputmode={c.tipo === 'number' ? 'numeric' : undefined} placeholder={c.exemplo} required={c.obrigatorio} />
+      )}
+    </label>
+  ))}
+  <input type="hidden" name="text" value={intro} />
+  <button class="btn cheio" type="submit" style="justify-self:start">{botao}</button>
+  <p class="nota">Abre o WhatsApp com a mensagem pronta. Você revisa antes de enviar.</p>
+</form>
+<script>
+  function formWhats() {
+    document.querySelectorAll<HTMLFormElement>('form[data-wa]').forEach((f) => {
+      if (f.dataset.ok) return;
+      f.dataset.ok = '1';
+      const q = new URLSearchParams(location.search);
+      f.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[name]').forEach((el) => { const v = q.get(el.name); if (v && el.type !== 'hidden') el.value = v; });
+      f.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!f.reportValidity()) return;
+        const linhas = [...f.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[name]')]
+          .filter((el) => el.type !== 'hidden' && el.value.trim())
+          .map((el) => `${el.closest('label')!.firstChild!.textContent!.trim()}: ${el.value.trim()}`);
+        const texto = `${f.dataset.intro}\n\n${linhas.join('\n')}`;
+        window.open(`https://wa.me/${f.dataset.wa}?text=${encodeURIComponent(texto)}`, '_blank', 'noopener');
+      });
+    });
+  }
+  formWhats();
+  document.addEventListener('astro:page-load', formWhats);
+</script>

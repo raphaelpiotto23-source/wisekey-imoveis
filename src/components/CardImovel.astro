@@ -1,0 +1,37 @@
+---
+import { Image } from 'astro:assets';
+import { brl, m2, TIPO, STATUS, comparaBairro, u } from '../lib/imoveis.js';
+const { imovel, carregar = 'lazy' } = Astro.props;
+const d = imovel.data;
+const c = comparaBairro(d);
+const tipoTxt = d.condominio_nome && d.tipo === 'casa' ? 'Casa em condomínio' : d.tipo === 'apartamento' && (d.area_construida ?? 99) <= 40 ? 'Studio' : TIPO[d.tipo];
+const ehTerreno = d.tipo === 'terreno' || d.tipo === 'chacara';
+const compCls = !c ? '' : c.dif <= -0.02 ? 'abaixo' : c.dif >= 0.02 ? 'acima' : 'na';
+const compTxt = !c ? '' : c.dif <= -0.02 ? `${Math.round(-c.dif * 100)}% abaixo` : c.dif >= 0.02 ? `${Math.round(c.dif * 100)}% acima` : 'Na';
+---
+<a class="card" href={u(`/imoveis/${imovel.id}/`)}
+   data-tipo={d.tipo} data-bairro={d.bairro} data-preco={d.preco} data-quartos={d.quartos ?? 0}
+   data-area={(ehTerreno ? d.area_terreno : d.area_construida) ?? 0} data-codigo={d.codigo.toLowerCase()} data-dif={c ? c.dif : 9}>
+  <div class={`foto${d.fotos_ilustrativas ? ' ilustra' : ''}`}>
+    <Image src={d.fotos[0]} alt={`${tipoTxt} no ${d.bairro}: ${d.titulo}`} widths={[400, 760]} sizes="(max-width: 700px) 92vw, 380px" loading={carregar} />
+    <div class="selos">
+      {d.demo && <span class="ex">Exemplo</span>}
+      {d.status !== 'disponivel' && <span class={d.status === 'reservado' ? 'res' : 'vend'}>{STATUS[d.status]}</span>}
+      {d.laudo && <span>Avaliado com laudo</span>}
+      {d.fotos_ilustrativas && <span>Foto ilustrativa</span>}
+    </div>
+  </div>
+  <div class="corpo">
+    <div class="l1"><span>{tipoTxt}</span><span>{d.codigo}</span></div>
+    <div class="bairro">{d.bairro}</div>
+    <div class="icones">
+      {!ehTerreno && d.area_construida && <span><svg><use href="#i-area" /></svg>{m2(d.area_construida)}</span>}
+      {d.area_terreno && <span><svg><use href="#i-terreno" /></svg>{m2(d.area_terreno)}</span>}
+      {d.quartos ? <span><svg><use href="#i-cama" /></svg>{d.quartos}</span> : null}
+      {d.suites ? <span><svg><use href="#i-suite" /></svg>{d.suites}</span> : null}
+      {d.vagas ? <span><svg><use href="#i-carro" /></svg>{d.vagas}</span> : null}
+    </div>
+    <div class="preco">{brl(d.preco)}</div>
+    {c && <span class={`comp ${compCls}`}>{compTxt} da mediana do bairro por m²</span>}
+  </div>
+</a>

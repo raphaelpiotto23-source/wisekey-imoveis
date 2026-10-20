@@ -1,0 +1,117 @@
+# Painel de cadastro (Pages CMS, https://app.pagescms.org).
+# Entra com a conta do GitHub, escolhe o repositório wisekey-imoveis e aparece o formulário "Imóveis".
+# Cada imóvel salvo vira um arquivo em src/content/imoveis/ e o site se refaz sozinho.
+media:
+  input: src/assets/imoveis
+  output: ../../assets/imoveis
+  extensions: [jpg, jpeg, png, webp]
+
+content:
+  - name: imoveis
+    label: "Imóveis"
+    type: collection
+    path: src/content/imoveis
+    filename: "{fields.codigo}.md"
+    view:
+      fields: [codigo, titulo, preco, status, publicado]
+      primary: titulo
+      sort: [codigo, preco]
+      search: [codigo, titulo, bairro]
+    fields:
+      - name: codigo
+        label: "Código (ex.: WK-001)"
+        type: string
+        required: true
+      - name: titulo
+        label: "Título do anúncio"
+        description: "Uma linha que diga o que o imóvel é. Ex.: Casa térrea de 3 quartos com quintal"
+        type: string
+        required: true
+      - name: tipo
+        label: "Tipo"
+        type: select
+        required: true
+        options:
+          values:
+            - { value: casa, label: Casa }
+            - { value: apartamento, label: Apartamento }
+            - { value: terreno, label: Terreno }
+            - { value: chacara, label: Chácara }
+            - { value: comercial, label: Comercial }
+      - name: status
+        label: "Situação"
+        type: select
+        default: disponivel
+        options:
+          values:
+            - { value: disponivel, label: Disponível }
+            - { value: reservado, label: Reservado }
+            - { value: vendido, label: Vendido }
+      - name: bairro
+        label: "Bairro"
+        description: "Escreva como na página de bairros (ex.: Terras de São José). Assim entra a comparação de preço."
+        type: string
+        required: true
+      - name: condominio_nome
+        label: "Nome do condomínio (se for condomínio fechado)"
+        type: string
+      - name: preco
+        label: "Preço (só números, ex.: 850000)"
+        type: number
+        required: true
+      - name: condominio_mensal
+        label: "Condomínio por mês (R$)"
+        type: number
+      - name: iptu_anual
+        label: "IPTU por ano (R$)"
+        type: number
+      - name: area_construida
+        label: "Área construída (m²)"
+        type: number
+      - name: area_terreno
+        label: "Área do terreno (m²)"
+        type: number
+      - name: quartos
+        label: "Quartos"
+        type: number
+      - name: suites
+        label: "Suítes"
+        type: number
+      - name: banheiros
+        label: "Banheiros"
+        type: number
+      - name: vagas
+        label: "Vagas"
+        type: number
+      - name: destaques
+        label: "Destaques (um por linha, até 4)"
+        type: string
+        list: { max: 4 }
+      - name: fotos
+        label: "Fotos (a primeira é a capa)"
+        type: image
+        required: true
+        list: { min: 1, max: 30 }
+      - name: video
+        label: "Link de vídeo (opcional)"
+        type: string
+      - name: laudo
+        label: "Preço definido com laudo"
+        type: boolean
+        default: false
+      - name: autorizacao_escrita
+        label: "Data da autorização escrita do proprietário"
+        description: "Obrigatória para o imóvel aparecer no site (Lei 6.530/78, art. 20, III)."
+        type: date
+      - name: publicado
+        label: "Publicar no site"
+        description: "Só aparece se também tiver a data da autorização."
+        type: boolean
+        default: false
+      - name: demo
+        label: "Imóvel de exemplo (nunca vai ao ar)"
+        type: boolean
+        default: false
+      - name: body
+        label: "Descrição"
+        type: rich-text

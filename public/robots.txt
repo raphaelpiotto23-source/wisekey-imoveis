@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://imoveis.wisekey.co/sitemap.xml

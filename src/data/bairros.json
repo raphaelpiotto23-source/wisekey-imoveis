@@ -1,0 +1,394 @@
+{
+ "fonte": "Amostra de anuncios de 6 imobiliarias locais, coleta 25/08/2026. Preco de anuncio, nao de fechamento. Citar como rede parceira local.",
+ "corte": "n>=5 por bairro e tipo",
+ "cidade": {
+  "casa": {
+   "n": 225,
+   "m2_mediana": 4828,
+   "preco_mediano": 800000
+  },
+  "apartamento": {
+   "n": 90,
+   "m2_mediana": 6996,
+   "preco_mediano": 580000
+  },
+  "terreno": {
+   "n": 193,
+   "m2_mediana": 796,
+   "preco_mediano": 250000
+  }
+ },
+ "bairros": {
+  "centro": {
+   "nome": "Centro",
+   "anuncios_total": 60,
+   "cond_fechado": 12,
+   "tipos": {
+    "casa": {
+     "n": 20,
+     "m2_mediana": 3280,
+     "m2_p25": 3012,
+     "m2_p75": 4080,
+     "preco_mediano": 796000
+    },
+    "apartamento": {
+     "n": 24,
+     "m2_mediana": 6028,
+     "m2_p25": 4530,
+     "m2_p75": 8904,
+     "preco_mediano": 920000
+    }
+   }
+  },
+  "jardim nova sao joao": {
+   "nome": "Jardim Nova São João",
+   "anuncios_total": 29,
+   "cond_fechado": 16,
+   "tipos": {
+    "apartamento": {
+     "n": 18,
+     "m2_mediana": 8722,
+     "m2_p25": 6072,
+     "m2_p75": 9318,
+     "preco_mediano": 543911
+    },
+    "casa": {
+     "n": 7,
+     "m2_mediana": 4762,
+     "m2_p25": 4004,
+     "m2_p75": 5272,
+     "preco_mediano": 650000
+    }
+   }
+  },
+  "terras de sao jose": {
+   "nome": "Terras de São José",
+   "anuncios_total": 27,
+   "cond_fechado": 12,
+   "tipos": {
+    "casa": {
+     "n": 10,
+     "m2_mediana": 5696,
+     "m2_p25": 5514,
+     "m2_p75": 6083,
+     "preco_mediano": 1100000
+    },
+    "terreno": {
+     "n": 7,
+     "m2_mediana": 883,
+     "m2_p25": 850,
+     "m2_p75": 916,
+     "preco_mediano": 270000
+    },
+    "apartamento": {
+     "n": 8,
+     "m2_mediana": 11750,
+     "m2_p25": 11333,
+     "m2_p75": 12000,
+     "preco_mediano": 357500
+    }
+   }
+  },
+  "recanto do bosque": {
+   "nome": "Recanto do Bosque",
+   "anuncios_total": 26,
+   "cond_fechado": 19,
+   "tipos": {
+    "terreno": {
+     "n": 7,
+     "m2_mediana": 1592,
+     "m2_p25": 1114,
+     "m2_p75": 2170,
+     "preco_mediano": 1300000
+    },
+    "casa": {
+     "n": 15,
+     "m2_mediana": 9589,
+     "m2_p25": 8550,
+     "m2_p75": 10152,
+     "preco_mediano": 3340000
+    }
+   }
+  },
+  "vila brasil": {
+   "nome": "Vila Brasil",
+   "anuncios_total": 9,
+   "cond_fechado": 0,
+   "tipos": {
+    "casa": {
+     "n": 5,
+     "m2_mediana": 3012,
+     "m2_p25": 2711,
+     "m2_p75": 3375,
+     "preco_mediano": 400000
+    }
+   }
+  },
+  "jardim aurora": {
+   "nome": "Jardim Aurora",
+   "anuncios_total": 22,
+   "cond_fechado": 0,
+   "tipos": {
+    "casa": {
+     "n": 11,
+     "m2_mediana": 6226,
+     "m2_p25": 5302,
+     "m2_p75": 6448,
+     "preco_mediano": 375000
+    },
+    "terreno": {
+     "n": 9,
+     "m2_mediana": 600,
+     "m2_p25": 562,
+     "m2_p75": 679,
+     "preco_mediano": 120000
+    }
+   }
+  },
+  "riviera de sao joao": {
+   "nome": "Riviera de São João",
+   "anuncios_total": 18,
+   "cond_fechado": 5,
+   "tipos": {
+    "terreno": {
+     "n": 15,
+     "m2_mediana": 833,
+     "m2_p25": 708,
+     "m2_p75": 1263,
+     "preco_mediano": 280000
+    }
+   }
+  },
+  "perpetuo socorro": {
+   "nome": "Perpétuo Socorro",
+   "anuncios_total": 13,
+   "cond_fechado": 6,
+   "tipos": {
+    "apartamento": {
+     "n": 10,
+     "m2_mediana": 8476,
+     "m2_p25": 5342,
+     "m2_p75": 9998,
+     "preco_mediano": 857500
+    }
+   }
+  },
+  "parque alvorada": {
+   "nome": "Parque Alvorada",
+   "anuncios_total": 26,
+   "cond_fechado": 5,
+   "tipos": {
+    "terreno": {
+     "n": 14,
+     "m2_mediana": 1204,
+     "m2_p25": 1014,
+     "m2_p75": 1391,
+     "preco_mediano": 422500
+    },
+    "casa": {
+     "n": 6,
+     "m2_mediana": 6002,
+     "m2_p25": 3676,
+     "m2_p75": 6372,
+     "preco_mediano": 1325000
+    }
+   }
+  },
+  "jardim magalhaes": {
+   "nome": "Jardim Magalhães",
+   "anuncios_total": 6,
+   "cond_fechado": 5,
+   "tipos": {
+    "apartamento": {
+     "n": 6,
+     "m2_mediana": 5788,
+     "m2_p25": 5072,
+     "m2_p75": 6284,
+     "preco_mediano": 304000
+    }
+   }
+  },
+  "jardim santo andre": {
+   "nome": "Jardim Santo André",
+   "anuncios_total": 18,
+   "cond_fechado": 8,
+   "tipos": {
+    "casa": {
+     "n": 13,
+     "m2_mediana": 5882,
+     "m2_p25": 4459,
+     "m2_p75": 8808,
+     "preco_mediano": 1700000
+    }
+   }
+  },
+  "recanto do lago": {
+   "nome": "Recanto do Lago",
+   "anuncios_total": 15,
+   "cond_fechado": 3,
+   "tipos": {
+    "casa": {
+     "n": 9,
+     "m2_mediana": 4867,
+     "m2_p25": 4367,
+     "m2_p75": 5340,
+     "preco_mediano": 1000000
+    }
+   }
+  },
+  "vila conrado": {
+   "nome": "Vila Conrado",
+   "anuncios_total": 10,
+   "cond_fechado": 1,
+   "tipos": {
+    "casa": {
+     "n": 5,
+     "m2_mediana": 3977,
+     "m2_p25": 3878,
+     "m2_p75": 4333,
+     "preco_mediano": 450000
+    }
+   }
+  },
+  "portal da alianca": {
+   "nome": "Portal da Aliança I",
+   "anuncios_total": 13,
+   "cond_fechado": 0,
+   "tipos": {
+    "terreno": {
+     "n": 10,
+     "m2_mediana": 590,
+     "m2_p25": 529,
+     "m2_p75": 638,
+     "preco_mediano": 178000
+    }
+   }
+  },
+  "portal da alianca ii": {
+   "nome": "Portal da Aliança II",
+   "anuncios_total": 12,
+   "cond_fechado": 0,
+   "tipos": {
+    "terreno": {
+     "n": 10,
+     "m2_mediana": 572,
+     "m2_p25": 510,
+     "m2_p75": 610,
+     "preco_mediano": 168950
+    }
+   }
+  },
+  "jardim das paineiras": {
+   "nome": "Jardim das Paineiras",
+   "anuncios_total": 10,
+   "cond_fechado": 0,
+   "tipos": {
+    "terreno": {
+     "n": 5,
+     "m2_mediana": 245,
+     "m2_p25": 245,
+     "m2_p75": 280,
+     "preco_mediano": 300000
+    }
+   }
+  },
+  "recanto da serra": {
+   "nome": "Recanto da Serra",
+   "anuncios_total": 10,
+   "cond_fechado": 0,
+   "tipos": {
+    "terreno": {
+     "n": 6,
+     "m2_mediana": 766,
+     "m2_p25": 694,
+     "m2_p75": 848,
+     "preco_mediano": 199000
+    }
+   }
+  },
+  "jardim das flores": {
+   "nome": "Jardim das Flores",
+   "anuncios_total": 6,
+   "cond_fechado": 0,
+   "tipos": {
+    "terreno": {
+     "n": 5,
+     "m2_mediana": 833,
+     "m2_p25": 762,
+     "m2_p75": 943,
+     "preco_mediano": 300000
+    }
+   }
+  },
+  "colinas do alegre": {
+   "nome": "Colinas do Alegre",
+   "anuncios_total": 9,
+   "cond_fechado": 0,
+   "tipos": {
+    "terreno": {
+     "n": 7,
+     "m2_mediana": 950,
+     "m2_p25": 875,
+     "m2_p75": 1000,
+     "preco_mediano": 190000
+    }
+   }
+  },
+  "jardim monte verde": {
+   "nome": "Jardim Monte Verde",
+   "anuncios_total": 15,
+   "cond_fechado": 0,
+   "tipos": {
+    "terreno": {
+     "n": 11,
+     "m2_mediana": 800,
+     "m2_p25": 684,
+     "m2_p75": 833,
+     "preco_mediano": 240000
+    }
+   }
+  },
+  "parque das nacoes": {
+   "nome": "Parque das Nações",
+   "anuncios_total": 8,
+   "cond_fechado": 5,
+   "tipos": {
+    "apartamento": {
+     "n": 5,
+     "m2_mediana": 4082,
+     "m2_p25": 3966,
+     "m2_p75": 4174,
+     "preco_mediano": 460000
+    }
+   }
+  },
+  "jardim nova uniao": {
+   "nome": "Jardim Nova União",
+   "anuncios_total": 6,
+   "cond_fechado": 0,
+   "tipos": {
+    "terreno": {
+     "n": 6,
+     "m2_mediana": 542,
+     "m2_p25": 526,
+     "m2_p75": 569,
+     "preco_mediano": 102500
+    }
+   }
+  },
+  "morro azul": {
+   "nome": "Morro Azul",
+   "anuncios_total": 9,
+   "cond_fechado": 9,
+   "tipos": {
+    "casa": {
+     "n": 6,
+     "m2_mediana": 10508,
+     "m2_p25": 9901,
+     "m2_p75": 10896,
+     "preco_mediano": 4750000
+    }
+   }
+  }
+ }
+}

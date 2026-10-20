@@ -1,0 +1,128 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import CardImovel from '../components/CardImovel.astro';
+import { listarImoveis, listaBairros, brl, comparaBairro, u } from '../lib/imoveis.js';
+import catCasa from '../assets/categorias/casas.webp';
+import catApto from '../assets/categorias/apartamentos.webp';
+import catTerreno from '../assets/categorias/terrenos.webp';
+import catCond from '../assets/categorias/condominio.webp';
+
+const imoveis = await listarImoveis();
+const destaque = imoveis.filter((i) => i.data.status !== 'vendido').slice(0, 8);
+const capa = imoveis.find((i) => !i.data.fotos_ilustrativas && i.data.status === 'disponivel');
+const capaC = capa ? comparaBairro(capa.data) : null;
+const bairros = listaBairros();
+const principal = (b) => {
+  const [t, v] = Object.entries(b.tipos).sort((a, c) => c[1].n - a[1].n)[0];
+  return { t: t === 'apartamento' ? 'apto' : t, v: v.m2_mediana };
+};
+const cats = [
+  { img: catCasa, nome: 'Casas', href: u('/imoveis/?tipo=casa') },
+  { img: catApto, nome: 'Apartamentos', href: u('/imoveis/?tipo=apartamento') },
+  { img: catTerreno, nome: 'Terrenos', href: u('/imoveis/?tipo=terreno') },
+  { img: catCond, nome: 'Condomínio fechado', href: u('/imoveis/?tipo=casa') },
+];
+const opcBairros = [...new Set(imoveis.map((i) => i.data.bairro))].sort();
+---
+<Base title="Wisekey Imóveis | Imóveis à venda em São João da Boa Vista com a conta aberta" description="Casas, apartamentos e terrenos à venda em São João da Boa Vista, com o preço comparado ao do bairro. Avaliação do seu imóvel com laudo.">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <h1>A sua casa em São João, com a conta aberta.</h1>
+        <p class="lede">Imóveis à venda com o preço comparado ao do bairro. E a avaliação do seu imóvel, com laudo.</p>
+        <form class="busca" action={u('/imoveis/')} method="get" role="search">
+          <label for="b-tipo">Tipo<select id="b-tipo" name="tipo"><option value="">Todos</option><option value="casa">Casa</option><option value="apartamento">Apartamento</option><option value="terreno">Terreno</option></select></label>
+          <label for="b-bairro">Bairro<select id="b-bairro" name="bairro"><option value="">Qualquer bairro</option>{opcBairros.map((b) => <option value={b}>{b}</option>)}</select></label>
+          <label for="b-preco">Até quanto<select id="b-preco" name="preco"><option value="">Qualquer valor</option><option value="300000">R$ 300 mil</option><option value="500000">R$ 500 mil</option><option value="900000">R$ 900 mil</option><option value="1500000">R$ 1,5 milhão</option></select></label>
+          <label for="b-cod">Código<input id="b-cod" name="codigo" placeholder="WK-001" autocomplete="off" /></label>
+          <button class="btn" type="submit">Buscar</button>
+        </form>
+        <p class="vende">Vai vender? <a href={u('/avaliar/')}>Avalie seu imóvel</a></p>
+      </div>
+      {capa && (
+        <div class="circulo">
+          <Image src={capa.data.fotos[0]} alt={capa.data.titulo} widths={[420, 760]} sizes="(max-width: 900px) 80vw, 420px" loading="eager" />
+          <a href={u(`/imoveis/${capa.id}/`)}>{capa.data.titulo}<b>{brl(capa.data.preco)}</b>{capaC && <span class={`comp ${capaC.dif <= -0.02 ? 'abaixo' : capaC.dif >= 0.02 ? 'acima' : 'na'}`}>{capaC.dif <= -0.02 ? `${Math.round(-capaC.dif * 100)}% abaixo` : capaC.dif >= 0.02 ? `${Math.round(capaC.dif * 100)}% acima` : 'Na'} da mediana do bairro</span>}</a>
+        </div>
+      )}
+    </div>
+  </section>
+
+  {destaque.length > 0 && (
+    <section class="sec">
+      <div class="wrap">
+        <div class="cabeca">
+          <h2 class="titulo">Preço aberto<br />em todos.</h2>
+          <div class="setas"><button type="button" data-rolar="-1" aria-label="Anteriores">‹</button><button type="button" data-rolar="1" aria-label="Próximos">›</button></div>
+        </div>
+        <div class="trilho" id="trilho">{destaque.map((i, k) => <CardImovel imovel={i} carregar={k < 3 ? 'eager' : 'lazy'} />)}</div>
+        <p style="margin-top:20px"><a class="btn cont" href={u('/imoveis/')}>Ver todos os imóveis</a></p>
+      </div>
+    </section>
+  )}
+
+  <section class="sec" style="padding-top:0">
+    <div class="wrap">
+      <div class="par">
+        <h2 class="titulo">O que você procura?</h2>
+        <p class="txt">Comece pelo tipo. A busca já abre filtrada, com o preço de cada imóvel comparado ao <strong>preço do m² do bairro</strong>.</p>
+      </div>
+      <div class="cats">
+        {cats.map((c) => (
+          <a class="cat" href={c.href}><Image src={c.img} alt="" widths={[320, 600]} sizes="(max-width: 900px) 45vw, 290px" /><div><b>{c.nome}</b><small>Ver imóveis</small></div></a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="sec cinza" id="bairros">
+    <div class="wrap">
+      <div class="par">
+        <h2 class="titulo it">O seu bairro<br />tem preço.</h2>
+        <p class="txt">Mediana do preço pedido nos anúncios de {bairros.length} bairros de São João, por m². Nenhuma imobiliária da cidade mostra isso. <strong>A gente mostra antes de você perguntar.</strong></p>
+      </div>
+      <div class="bairros">
+        {bairros.slice(0, 8).map((b) => {
+          const p = principal(b);
+          return <a class="bairro-c" href={u(`/bairros/${b.slug}/`)}><span><b>{b.nome}</b><small>{b.anuncios_total} anúncios</small></span><span class="v"><small>{p.t} · m²</small>{brl(p.v)}</span></a>;
+        })}
+      </div>
+      <p style="margin-top:30px"><a class="btn cont" href={u('/bairros/')}>Ver os {bairros.length} bairros</a></p>
+    </div>
+  </section>
+
+  <section class="sec" id="como">
+    <div class="wrap move">
+      <h2 class="titulo">Como a gente trabalha:</h2>
+      <div class="itens">
+        <div><h3>Avaliação</h3><p>Você conta como é o imóvel. A gente cruza com os anúncios do bairro e devolve a faixa de valor.</p></div>
+        <div><h3>Laudo</h3><p>Visita, comparáveis e um valor defendido por método, conforme a NBR 14653. Avaliar não obriga a vender com a gente.</p></div>
+        <div><h3>Preço aberto</h3><p>Todo anúncio mostra o preço e onde ele fica em relação ao bairro.</p></div>
+        <div><h3>Notícia para o dono</h3><p>A cada quinze dias você sabe quantas pessoas viram, quem visitou e o que mudou no bairro.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:0">
+    <div class="wrap">
+      <h2 class="titulo">Não prometemos milagres.<br /><span class="cinza-t">Mostramos a conta.</span></h2>
+      <div class="portas">
+        <div class="porta"><div><h3>Quero vender</h3><p>Seu imóvel vale o que o dado diz. Não o que o vizinho pediu.</p></div><a class="btn" href={u('/avaliar/')}>Avaliar meu imóvel</a></div>
+        <div class="porta borda"><div><h3>Quero comprar</h3><p>Diga o bairro, a faixa e o que não pode faltar. A gente procura, inclusive o que ainda não está anunciado.</p></div><a class="btn cont" href={u('/procuro/')}>Dizer o que procuro</a></div>
+      </div>
+    </div>
+  </section>
+</Base>
+<script>
+  function setas() {
+    const t = document.getElementById('trilho');
+    document.querySelectorAll<HTMLButtonElement>('[data-rolar]').forEach((b) => {
+      if (b.dataset.ok) return;
+      b.dataset.ok = '1';
+      b.addEventListener('click', () => t?.scrollBy({ left: +b.dataset.rolar! * t.clientWidth * 0.8, behavior: 'smooth' }));
+    });
+  }
+  setas();
+  document.addEventListener('astro:page-load', setas);
+</script>

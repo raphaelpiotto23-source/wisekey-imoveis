@@ -1,0 +1,44 @@
+---
+import Base from '../../layouts/Base.astro';
+import Regua from '../../components/Regua.astro';
+import CardImovel from '../../components/CardImovel.astro';
+import { listaBairros, listarImoveis, brl, TIPO, dadosBairro, u } from '../../lib/imoveis.js';
+
+export function getStaticPaths() {
+  return listaBairros().map((b) => ({ params: { slug: b.slug }, props: { b } }));
+}
+const { b } = Astro.props;
+const tipos = Object.entries(b.tipos);
+const imoveis = (await listarImoveis()).filter((i) => dadosBairro(i.data.bairro)?.slug === b.slug);
+const unidade = (t) => (t === 'terreno' ? 'm² de terreno' : 'm² construído');
+const resumo = tipos.map(([t, v]) => `${TIPO[t].toLowerCase()} ${brl(v.m2_mediana)}/m²`).join(', ');
+---
+<Base title={`${b.nome}, São João da Boa Vista: preço do m² | Wisekey Imóveis`} description={`Quanto custa morar no ${b.nome}, em São João da Boa Vista: ${resumo}. Faixa de preço e imóveis à venda no bairro.`} atual="bairros">
+  <section class="sec topo-curto">
+    <div class="wrap estreito">
+      <div class="trilha"><a href={u('/bairros/')}>Bairros</a> › São João da Boa Vista</div>
+      <h1 class="titulo menor it">{b.nome}</h1>
+      <p class="lede">{b.anuncios_total} imóveis anunciados à venda na última coleta{b.cond_fechado ? `, ${b.cond_fechado} deles em condomínio fechado` : ''}.</p>
+      {tipos.map(([t, v]) => (
+        <div class="conta" style="margin-top:28px">
+          <h2 style="font-size:1.3rem;margin-bottom:10px">{TIPO[t]}</h2>
+          <p style="margin:0">Metade dos anúncios de {TIPO[t].toLowerCase()} no {b.nome} pede até <b>{brl(v.m2_mediana)} por {unidade(t)}</b>. A metade do meio fica entre {brl(v.m2_p25)} e {brl(v.m2_p75)}. Preço mediano do imóvel: {brl(v.preco_mediano)}. Base: {v.n} anúncios.</p>
+          <Regua p25={v.m2_p25} p75={v.m2_p75} mediana={v.m2_mediana} />
+        </div>
+      ))}
+      <div class="porta borda" style="margin-top:36px;min-height:0">
+        <div><h3 style="font-size:clamp(1.5rem,3vw,2.1rem)">Você tem imóvel no {b.nome}?</h3><p>A faixa é do bairro. O valor do seu imóvel sai no laudo, com os comparáveis certos.</p></div>
+        <div class="btns"><a class="btn" href={u(`/avaliar/?bairro=${encodeURIComponent(b.nome)}`)}>Avaliar meu imóvel</a><a class="btn cont" href={u(`/procuro/?bairro=${encodeURIComponent(b.nome)}`)}>Quero morar aqui</a></div>
+      </div>
+      <p class="nota" style="margin-top:22px">Preço de anúncio, não de fechamento. Fonte: rede parceira local, coleta de ago/2026. Só entram tipos com 5 ou mais anúncios no bairro.</p>
+    </div>
+  </section>
+  {imoveis.length > 0 && (
+    <section class="sec cinza">
+      <div class="wrap">
+        <h2 class="titulo menor" style="margin-bottom:32px">À venda no {b.nome}</h2>
+        <div class="grade">{imoveis.map((i) => <CardImovel imovel={i} />)}</div>
+      </div>
+    </section>
+  )}
+</Base>
