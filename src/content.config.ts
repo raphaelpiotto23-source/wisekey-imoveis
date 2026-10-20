@@ -13,6 +13,8 @@ const imoveis = defineCollection({
       titulo: z.string(),
       tipo: z.enum(['casa', 'apartamento', 'terreno', 'chacara', 'comercial']),
       status: z.enum(['disponivel', 'reservado', 'vendido']).default('disponivel'),
+      // Data da venda (AAAA-MM-DD). Com status vendido, o imóvel sai do site 60 dias depois.
+      vendido_em: z.preprocess((v) => (v === '' || v == null ? undefined : v), z.coerce.date().optional()),
       bairro: z.string(),
       condominio_nome: z.string().nullish(),
       preco: z.number().positive(),

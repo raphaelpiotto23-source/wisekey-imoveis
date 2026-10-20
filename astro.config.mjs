@@ -1,8 +1,9 @@
 import { defineConfig } from 'astro/config';
 
-// SITE e BASE vêm do deploy. Preview no GitHub Pages: BASE=/wisekey-imoveis. Produção: raiz de imoveis.wisekey.co.
+// SITE e BASE vêm do deploy. Produção: raiz de wisekeyimobiliaria.com.br (o padrão).
+// Preview no GitHub Pages: SITE=https://raphaelpiotto23-source.github.io BASE=/wisekey-imoveis MODO=demo.
 export default defineConfig({
-  site: process.env.SITE || 'https://imoveis.wisekey.co',
+  site: process.env.SITE || 'https://wisekeyimobiliaria.com.br',
   base: process.env.BASE || '/',
   trailingSlash: 'ignore',
   build: { inlineStylesheets: 'always' },

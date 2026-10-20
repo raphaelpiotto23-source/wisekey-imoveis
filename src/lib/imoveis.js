@@ -15,11 +15,25 @@ export function visivel(i) {
   return i.data.publicado && !!i.data.autorizacao_escrita;
 }
 
+// Vendido fica no ar com a etiqueta e sai sozinho 60 dias depois de vendido_em.
+// O deploy roda todo dia de manhã para essa conta valer sem ninguém mexer.
+export const DIAS_VENDIDO = 60;
+const avisados = new Set();
+export function aindaNoAr(i, hoje = new Date()) {
+  if (i.data.status !== 'vendido') return true;
+  if (!i.data.vendido_em) {
+    if (!avisados.has(i.id)) console.warn(`[imoveis] ${i.data.codigo} está vendido sem vendido_em: fica no ar até ter a data.`);
+    avisados.add(i.id);
+    return true;
+  }
+  return hoje - i.data.vendido_em <= DIAS_VENDIDO * 864e5;
+}
+
 export async function listarImoveis() {
   const todos = await getCollection('imoveis');
   const ordem = { disponivel: 0, reservado: 1, vendido: 2 };
   return todos
-    .filter(visivel)
+    .filter((i) => visivel(i) && aindaNoAr(i))
     .sort((a, b) => ordem[a.data.status] - ordem[b.data.status] || a.data.preco - b.data.preco);
 }
 
@@ -44,7 +58,8 @@ export const brl = (v) => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
 export const m2 = (v) => Math.round(v).toLocaleString('pt-BR') + ' m²';
 
 export const TIPO = { casa: 'Casa', apartamento: 'Apartamento', terreno: 'Terreno', chacara: 'Chácara', comercial: 'Comercial' };
-export const STATUS = { disponivel: 'Disponível', reservado: 'Reservado', vendido: 'Vendido' };
+export const TIPO_PLURAL = { casa: 'Casas', apartamento: 'Apartamentos', terreno: 'Terrenos', chacara: 'Chácaras', comercial: 'Imóveis comerciais' };
+export const STATUS = {disponivel: 'Disponível', reservado: 'Reservado', vendido: 'Vendido' };
 
 // R$/m² do próprio imóvel: área construída para casa e apartamento, terreno para terreno e chácara.
 export function precoM2(d) {

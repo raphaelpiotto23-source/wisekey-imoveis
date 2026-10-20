@@ -4,7 +4,7 @@ import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Regua from '../../components/Regua.astro';
 import CardImovel from '../../components/CardImovel.astro';
-import { listarImoveis, brl, m2, TIPO, STATUS, comparaBairro, wa, u, dadosBairro } from '../../lib/imoveis.js';
+import { listarImoveis, brl, m2, TIPO, TIPO_PLURAL, STATUS, comparaBairro, wa, u, dadosBairro } from '../../lib/imoveis.js';
 import site from '../../data/site.json';
 
 export async function getStaticPaths() {
@@ -51,7 +51,7 @@ const outros = vizinhos.length ? vizinhos : todos.filter((i) => i.id !== imovel.
     <div class="faixa" aria-label="Fotos do imóvel. Arraste para o lado.">
       {d.fotos.map((f, i) => (
         <figure>
-          <Image src={f} alt={d.legendas[i] || `Foto ${i + 1} de ${d.fotos.length}: ${d.titulo}`} widths={[480, 900, 1400]} sizes="(max-width: 900px) 90vw, 760px" loading={i < 2 ? 'eager' : 'lazy'} class={d.fotos_ilustrativas ? 'ilustra' : undefined} style={d.fotos_ilustrativas ? 'filter:grayscale(1)' : undefined} />
+          <Image src={f} alt={d.legendas[i] || `Foto ${i + 1} de ${d.fotos.length}: ${d.titulo}`} widths={[480, 900, 1400]} sizes="(max-width: 900px) 90vw, 760px" loading={i < 2 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} class={d.fotos_ilustrativas ? 'ilustra' : undefined} style={d.fotos_ilustrativas ? 'filter:grayscale(1)' : undefined} />
           {d.legendas[i] && <figcaption>{d.legendas[i]}</figcaption>}
         </figure>
       ))}
@@ -80,7 +80,7 @@ const outros = vizinhos.length ? vizinhos : todos.filter((i) => i.id !== imovel.
         {grupos.length > 0 && (
           <>
             <h2>Características</h2>
-            <div class="carac">{grupos.map(([t, xs]) => <div><h4>{t}</h4><ul>{xs.map((x) => <li>{x}</li>)}</ul></div>)}</div>
+            <div class="carac">{grupos.map(([t, xs]) => <div><h3>{t}</h3><ul>{xs.map((x) => <li>{x}</li>)}</ul></div>)}</div>
           </>
         )}
 
@@ -109,7 +109,7 @@ const outros = vizinhos.length ? vizinhos : todos.filter((i) => i.id !== imovel.
         <div class="links">
           {b && <a href={u(`/bairros/${b.slug}/`)}>Preço do m² no {b.nome}</a>}
           <a href={u(`/imoveis/?bairro=${encodeURIComponent(d.bairro)}`)}>Imóveis no {d.bairro}</a>
-          <a href={u(`/imoveis/?tipo=${d.tipo}`)}>{TIPO[d.tipo]}s à venda</a>
+          <a href={u(`/imoveis/?tipo=${d.tipo}`)}>{TIPO_PLURAL[d.tipo]} à venda</a>
         </div>
       </div>
 

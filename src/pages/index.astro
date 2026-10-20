@@ -42,7 +42,7 @@ const opcBairros = [...new Set(imoveis.map((i) => i.data.bairro))].sort();
       </div>
       {capa && (
         <div class="circulo">
-          <Image src={capa.data.fotos[0]} alt={capa.data.titulo} widths={[420, 760]} sizes="(max-width: 900px) 80vw, 420px" loading="eager" />
+          <Image src={capa.data.fotos[0]} alt={capa.data.titulo} widths={[420, 760]} sizes="(max-width: 900px) 80vw, 420px" loading="eager" fetchpriority="high" />
           <a href={u(`/imoveis/${capa.id}/`)}>{capa.data.titulo}<b>{brl(capa.data.preco)}</b>{capaC && <span class={`comp ${capaC.dif <= -0.02 ? 'abaixo' : capaC.dif >= 0.02 ? 'acima' : 'na'}`}>{capaC.dif <= -0.02 ? `${Math.round(-capaC.dif * 100)}% abaixo` : capaC.dif >= 0.02 ? `${Math.round(capaC.dif * 100)}% acima` : 'Na'} da mediana do bairro</span>}</a>
         </div>
       )}

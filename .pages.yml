@@ -1,10 +1,12 @@
 # Painel de cadastro (Pages CMS, https://app.pagescms.org).
 # Entra com a conta do GitHub, escolhe o repositório wisekey-imoveis e aparece o formulário "Imóveis".
 # Cada imóvel salvo vira um arquivo em src/content/imoveis/ e o site se refaz sozinho.
+# Validado em 20/10/2026 contra o schema do Pages CMS (lib/config-schema.ts do repositório oficial).
 media:
   input: src/assets/imoveis
   output: ../../assets/imoveis
   extensions: [jpg, jpeg, png, webp]
+  rename: safe
 
 content:
   - name: imoveis
@@ -17,6 +19,9 @@ content:
       primary: titulo
       sort: [codigo, preco]
       search: [codigo, titulo, bairro]
+      default:
+        sort: codigo
+        order: asc
     fields:
       - name: codigo
         label: "Código (ex.: WK-001)"
@@ -33,20 +38,33 @@ content:
         required: true
         options:
           values:
-            - { value: casa, label: Casa }
-            - { value: apartamento, label: Apartamento }
-            - { value: terreno, label: Terreno }
-            - { value: chacara, label: Chácara }
-            - { value: comercial, label: Comercial }
+            - { name: casa, label: Casa }
+            - { name: apartamento, label: Apartamento }
+            - { name: terreno, label: Terreno }
+            - { name: chacara, label: Chácara }
+            - { name: comercial, label: Comercial }
       - name: status
         label: "Situação"
+        description: "Vendido some da busca 60 dias depois da data da venda."
         type: select
         default: disponivel
         options:
           values:
-            - { value: disponivel, label: Disponível }
-            - { value: reservado, label: Reservado }
-            - { value: vendido, label: Vendido }
+            - { name: disponivel, label: Disponível }
+            - { name: reservado, label: Reservado }
+            - { name: vendido, label: Vendido }
+      - name: vendido_em
+        label: "Data da venda (só se vendido)"
+        description: "Com a situação Vendido, o imóvel fica no site com a etiqueta e sai sozinho 60 dias depois desta data."
+        type: date
+        default: ""
+        options:
+          format: yyyy-MM-dd
+      - name: preco
+        label: "Preço (só números, ex.: 850000)"
+        type: number
+        required: true
+        options: { min: 1 }
       - name: bairro
         label: "Bairro"
         description: "Escreva como na página de bairros (ex.: Terras de São José). Assim entra a comparação de preço."
@@ -55,57 +73,103 @@ content:
       - name: condominio_nome
         label: "Nome do condomínio (se for condomínio fechado)"
         type: string
-      - name: preco
-        label: "Preço (só números, ex.: 850000)"
-        type: number
-        required: true
       - name: condominio_mensal
         label: "Condomínio por mês (R$)"
         type: number
+        options: { min: 0 }
       - name: iptu_anual
         label: "IPTU por ano (R$)"
         type: number
+        options: { min: 0 }
       - name: area_construida
         label: "Área construída (m²)"
         type: number
+        options: { min: 1 }
       - name: area_terreno
         label: "Área do terreno (m²)"
         type: number
+        options: { min: 1 }
       - name: quartos
         label: "Quartos"
         type: number
+        options: { min: 0 }
       - name: suites
         label: "Suítes"
         type: number
+        options: { min: 0 }
       - name: banheiros
         label: "Banheiros"
         type: number
+        options: { min: 0 }
       - name: vagas
         label: "Vagas"
         type: number
+        options: { min: 0 }
       - name: destaques
-        label: "Destaques (um por linha, até 4)"
+        label: "Destaques (até 4)"
         type: string
-        list: { max: 4 }
+        list: { max: 4, collapsible: false }
       - name: fotos
         label: "Fotos (a primeira é a capa)"
         type: image
         required: true
-        list: { min: 1, max: 30 }
+        options:
+          multiple: { max: 30 }
+      - name: legendas
+        label: "Legendas das fotos"
+        description: "Uma por foto, na mesma ordem. Ex.: Sala integrada com a varanda. Pode deixar vazio."
+        type: string
+        list: { max: 30, collapsible: false }
+      - name: fotos_ilustrativas
+        label: "Fotos ilustrativas (não são do imóvel)"
+        description: "Marque se as fotos são de decorado ou de referência. O site mostra o aviso."
+        type: boolean
+        default: false
+      - name: caracteristicas
+        label: "Características"
+        type: object
+        fields:
+          - name: area_externa
+            label: "Área externa"
+            description: "Ex.: Piscina, Churrasqueira, Quintal"
+            type: string
+            list: true
+          - name: comodos
+            label: "Cômodos"
+            description: "Ex.: Cozinha americana, Lavanderia, Escritório"
+            type: string
+            list: true
+          - name: facilidades
+            label: "Facilidades"
+            description: "Ex.: Portaria 24h, Elevador, Mobiliado"
+            type: string
+            list: true
+          - name: diferenciais
+            label: "Diferenciais"
+            description: "Ex.: Energia solar, Vista livre, Ar-condicionado"
+            type: string
+            list: true
       - name: video
         label: "Link de vídeo (opcional)"
+        description: "Endereço completo, começando com https://"
         type: string
+        pattern:
+          regex: "^(https?://.+)?$"
+          message: "Cole o link completo, começando com https://"
       - name: laudo
         label: "Preço definido com laudo"
         type: boolean
         default: false
       - name: autorizacao_escrita
         label: "Data da autorização escrita do proprietário"
-        description: "Obrigatória para o imóvel aparecer no site (Lei 6.530/78, art. 20, III)."
+        description: "Obrigatória para o imóvel aparecer no site (Lei 6.530/78, art. 20, III). Começa vazia de propósito."
         type: date
+        default: ""
+        options:
+          format: yyyy-MM-dd
       - name: publicado
         label: "Publicar no site"
-        description: "Só aparece se também tiver a data da autorização."
+        description: "Só aparece se também tiver a data da autorização. Desmarque para tirar do ar."
         type: boolean
         default: false
       - name: demo
@@ -115,3 +179,6 @@ content:
       - name: body
         label: "Descrição"
         type: rich-text
+        options:
+          format: markdown
+          media: false

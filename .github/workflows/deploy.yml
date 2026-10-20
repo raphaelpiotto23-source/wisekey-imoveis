@@ -1,10 +1,15 @@
-name: Preview no GitHub Pages
+name: Site no GitHub Pages
 
-# Por enquanto este repositório é o PREVIEW: publica com os imóveis de exemplo (MODO=demo, noindex)
-# em raphaelpiotto23-source.github.io/wisekey-imoveis/. A produção em imoveis.wisekey.co vem depois.
+# Dois modos, escolhidos pela variável do repositório DOMINIO (Settings → Secrets and variables → Actions → Variables).
+# Sem DOMINIO: PREVIEW em raphaelpiotto23-source.github.io/wisekey-imoveis/, com os imóveis de exemplo (MODO=demo, noindex).
+# Com DOMINIO=wisekeyimobiliaria.com.br: PRODUÇÃO na raiz do domínio, sem exemplo, indexável.
+#   O preview continua saindo em todo push como artefato "preview-demo" (baixar na aba Actions) e localmente com npm run dev.
+# Todo dia às 6h (Brasília) o site se refaz sozinho: é o que tira do ar o vendido com mais de 60 dias.
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '0 9 * * *'
   workflow_dispatch:
 
 permissions:
@@ -16,6 +21,9 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+env:
+  DOMINIO: ${{ vars.DOMINIO }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,14 +34,41 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx astro build
+
+      - name: Build do preview (com exemplos)
+        run: npx astro build --outDir dist-preview
         env:
           MODO: demo
           BASE: /wisekey-imoveis
           SITE: https://raphaelpiotto23-source.github.io
+
+      - name: Build de produção (sem exemplos)
+        if: env.DOMINIO != ''
+        run: |
+          npx astro build --outDir dist
+          echo "$DOMINIO" > dist/CNAME
+          # Trava: produção não sobe com imóvel de exemplo, faixa de preview ou noindex.
+          if ls dist/imoveis | grep -qi '^demo' || grep -rlE 'class="demo-faixa"|name="robots"|Imóvel de exemplo' dist --include=*.html; then
+            echo "Produção com marca de exemplo. Abortado."; exit 1
+          fi
+        env:
+          SITE: https://${{ vars.DOMINIO }}
+          BASE: /
+
+      - name: Sem domínio, o Pages publica o preview
+        if: env.DOMINIO == ''
+        run: cp -r dist-preview dist
+
+      - uses: actions/upload-artifact@v4
+        if: env.DOMINIO != ''
+        with:
+          name: preview-demo
+          path: dist-preview
+          retention-days: 14
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+
   deploy:
     needs: build
     runs-on: ubuntu-latest

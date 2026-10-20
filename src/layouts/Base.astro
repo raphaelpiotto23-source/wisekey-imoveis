@@ -4,6 +4,11 @@ import '../styles/global.css';
 import Icones from '../components/Icones.astro';
 import site from '../data/site.json';
 import { MODO_DEMO, wa, u } from '../lib/imoveis.js';
+// As três da primeira dobra (texto 300, botão 600, título 800 itálico): chegam antes do primeiro desenho
+// e evitam que cada fonte nova refaça o layout da página no celular.
+import f300 from '../styles/fonts/poppins-300.woff2?url';
+import f600 from '../styles/fonts/poppins-600.woff2?url';
+import f800i from '../styles/fonts/poppins-800i.woff2?url';
 
 interface Props {
   title: string;
@@ -21,7 +26,7 @@ const org = {
   '@context': 'https://schema.org',
   '@type': 'RealEstateAgent',
   name: site.nome,
-  url: site.url,
+  url: new URL(u('/'), raiz).href,
   address: { '@type': 'PostalAddress', streetAddress: 'Rua Orlando Fracari, 423, sala 2', addressLocality: 'São João da Boa Vista', addressRegion: 'SP', addressCountry: 'BR' },
   areaServed: 'São João da Boa Vista, SP',
   telephone: '+55 11 91795-2603',
@@ -39,6 +44,7 @@ const links = [
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>{title}</title>
+  {[f300, f600, f800i].map((f) => <link rel="preload" href={f} as="font" type="font/woff2" crossorigin />)}
   <meta name="description" content={description} />
   <link rel="canonical" href={canonical} />
   {MODO_DEMO && <meta name="robots" content="noindex, nofollow" />}
