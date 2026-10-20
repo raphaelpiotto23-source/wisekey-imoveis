@@ -3,7 +3,7 @@ import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 import Icones from '../components/Icones.astro';
 import site from '../data/site.json';
-import { MODO_DEMO, wa, u } from '../lib/imoveis.js';
+import { MODO_DEMO, wa, u, vitrineAberta } from '../lib/imoveis.js';
 // As três da primeira dobra (texto 300, botão 600, título 800 itálico): chegam antes do primeiro desenho
 // e evitam que cada fonte nova refaça o layout da página no celular.
 import f300 from '../styles/fonts/poppins-300.woff2?url';
@@ -31,8 +31,9 @@ const org = {
   areaServed: 'São João da Boa Vista, SP',
   telephone: '+55 11 91795-2603',
 };
+const vitrine = await vitrineAberta();
 const links = [
-  { href: u('/imoveis/'), txt: 'Imóveis', id: 'imoveis' },
+  ...(vitrine ? [{ href: u('/imoveis/'), txt: 'Imóveis', id: 'imoveis' }] : []),
   { href: u('/bairros/'), txt: 'Bairros', id: 'bairros' },
   { href: u('/procuro/'), txt: 'Procuro um imóvel', id: 'procuro' },
   { href: u('/#como'), txt: 'Como trabalhamos', id: 'como' },
@@ -87,9 +88,9 @@ const links = [
   <main><slot /></main>
   <footer class="rodape">
     <div class="wrap">
-      <div class="cols">
+      <div class={vitrine ? 'cols' : 'cols tres'}>
         <div><img src={u('/img/wisekey-claro.svg')} alt="wisekey" width="99" height="28" style="margin-bottom:14px" />Imobiliária em São João da Boa Vista.<br />{site.endereco}</div>
-        <div><b>Imóveis</b><a href={u('/imoveis/?tipo=casa')}>Casas à venda</a><a href={u('/imoveis/?tipo=apartamento')}>Apartamentos à venda</a><a href={u('/imoveis/?tipo=terreno')}>Terrenos à venda</a></div>
+        {vitrine && <div><b>Imóveis</b><a href={u('/imoveis/?tipo=casa')}>Casas à venda</a><a href={u('/imoveis/?tipo=apartamento')}>Apartamentos à venda</a><a href={u('/imoveis/?tipo=terreno')}>Terrenos à venda</a></div>}
         <div><b>Bairros</b><a href={u('/bairros/centro/')}>Centro</a><a href={u('/bairros/terras-de-sao-jose/')}>Terras de São José</a><a href={u('/bairros/recanto-do-bosque/')}>Recanto do Bosque</a><a href={u('/bairros/')}>Todos os bairros</a></div>
         <div><b>Para você</b><a href={u('/avaliar/')}>Avaliar meu imóvel</a><a href={u('/procuro/')}>Procuro um imóvel</a><a href={wa('Olá! Vim pelo site da Wisekey Imóveis.')}>Falar no WhatsApp</a></div>
       </div>

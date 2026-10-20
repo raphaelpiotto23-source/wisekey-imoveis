@@ -32,10 +32,20 @@ export function aindaNoAr(i, hoje = new Date()) {
 export async function listarImoveis() {
   const todos = await getCollection('imoveis');
   const ordem = { disponivel: 0, reservado: 1, vendido: 2 };
-  return todos
+  const lista = todos
     .filter((i) => visivel(i) && aindaNoAr(i))
     .sort((a, b) => ordem[a.data.status] - ordem[b.data.status] || a.data.preco - b.data.preco);
+  // Segunda trava, além da do workflow: imóvel com cara de exemplo derruba o build de produção.
+  const intruso = !MODO_DEMO && lista.find((i) => /^demo/i.test(i.id) || /^demo/i.test(i.data.codigo));
+  if (intruso) throw new Error(`[imoveis] ${intruso.data.codigo} parece exemplo e entraria na produção. Marque demo: true.`);
+  return lista;
 }
+
+// A vitrine (menu Imóveis, busca, carrossel e categorias da home) só abre com 3 imóveis no ar.
+// Antes disso a produção vive de avaliar, bairros e procuro. A ficha de cada imóvel autorizado
+// já existe desde o primeiro: por link direto, QR da placa e na página do bairro.
+export const VITRINE_MINIMO = 3;
+export const vitrineAberta = async () => (await listarImoveis()).length >= VITRINE_MINIMO;
 
 export const slug = (s) =>
   s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');

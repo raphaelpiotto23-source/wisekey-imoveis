@@ -12,8 +12,23 @@ const campos = [
   { nome: 'suites', rotulo: 'Suítes', opcoes: ['Nenhuma', '1', '2', '3 ou mais'] },
   { nome: 'nome', rotulo: 'Seu nome', exemplo: 'Maria', obrigatorio: true },
 ];
+// Regra do laudo (PTAM): fonte é o documento de produto, seção 10.4. Preço do avulso ainda não decidido
+// (seção 14, item 2): o FAQ não mostra número até o Raphael fechar.
+const faq = [
+  ['Quanto custa avaliar?', 'A pré-avaliação é grátis, sempre. Você conta como é o imóvel e recebe pelo WhatsApp, em até 48 horas, a faixa de valor de anúncio no bairro, o preço provável de fechamento e a leitura do preço que você tem na cabeça.'],
+  ['Qual a diferença entre a pré-avaliação e o laudo?', 'A pré-avaliação é uma faixa, feita com os anúncios do bairro, sem visita. O laudo (PTAM) é o número do seu imóvel: visita, conferência das áreas, comparáveis com fonte e data e valor defendido pelo método comparativo da NBR 14653, com assinatura do corretor. Serve para vender e também para inventário, partilha, divórcio ou garantia.'],
+  ['O laudo é pago?', 'Depende de como você vende. Com autorização exclusiva para a Wisekey, o laudo é grátis. Sem exclusiva, ele é pago à parte, como laudo avulso, e o valor a gente informa antes de qualquer visita.'],
+  ['E se eu pagar o laudo e depois vender com vocês?', 'O valor pago é descontado da comissão, desde que a venda seja feita com a gente em até 12 meses.'],
+  ['E se eu pagar o laudo e não vender com vocês?', 'O laudo é seu. Não tem nada a devolver nem a assinar.'],
+  ['Avaliar me obriga a vender com a Wisekey?', 'Não. Avaliar não obriga a vender com a gente, nem a assinar exclusiva.'],
+];
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+};
 ---
-<Base title="Quanto vale o meu imóvel em São João da Boa Vista | Wisekey Imóveis" description="Peça a avaliação do seu imóvel em São João da Boa Vista. Faixa do bairro na hora e laudo pelo método comparativo." atual="avaliar">
+<Base title="Quanto vale o meu imóvel em São João da Boa Vista | Wisekey Imóveis" description="Peça a avaliação do seu imóvel em São João da Boa Vista. Pré-avaliação grátis em 48 horas e laudo pelo método comparativo, grátis com exclusiva." atual="avaliar" jsonld={jsonld}>
   <section class="sec topo-curto">
     <div class="wrap estreito">
             <h1 class="titulo menor">Seu imóvel vale o que o dado diz. <span class="it cinza-t">Não o que o vizinho pediu.</span></h1>
@@ -28,6 +43,10 @@ const campos = [
         <li>Valor defendido pelo método comparativo, conforme a NBR 14653.</li>
       </ul>
       <p>Avaliar não obriga a vender com a gente.</p>
+      <h2 style="margin-top:56px;font-size:1.35rem;margin-bottom:12px">Perguntas frequentes</h2>
+      <div class="faq">
+        {faq.map(([q, a]) => <details><summary>{q}</summary><p>{a}</p></details>)}
+      </div>
     </div>
   </section>
 </Base>

@@ -2,15 +2,17 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import CardImovel from '../components/CardImovel.astro';
-import { listarImoveis, listaBairros, brl, comparaBairro, u } from '../lib/imoveis.js';
+import { listarImoveis, listaBairros, brl, comparaBairro, u, VITRINE_MINIMO } from '../lib/imoveis.js';
 import catCasa from '../assets/categorias/casas.webp';
 import catApto from '../assets/categorias/apartamentos.webp';
 import catTerreno from '../assets/categorias/terrenos.webp';
 import catCond from '../assets/categorias/condominio.webp';
 
 const imoveis = await listarImoveis();
+// Até 3 imóveis no ar, a home abre pela avaliação e pelos bairros. Sem busca, carrossel nem categorias.
+const vitrine = imoveis.length >= VITRINE_MINIMO;
 const destaque = imoveis.filter((i) => i.data.status !== 'vendido').slice(0, 8);
-const capa = imoveis.find((i) => !i.data.fotos_ilustrativas && i.data.status === 'disponivel');
+const capa = vitrine && imoveis.find((i) => !i.data.fotos_ilustrativas && i.data.status === 'disponivel');
 const capaC = capa ? comparaBairro(capa.data) : null;
 const bairros = listaBairros();
 const principal = (b) => {
@@ -25,11 +27,12 @@ const cats = [
 ];
 const opcBairros = [...new Set(imoveis.map((i) => i.data.bairro))].sort();
 ---
-<Base title="Wisekey Imóveis | Imóveis à venda em São João da Boa Vista com a conta aberta" description="Casas, apartamentos e terrenos à venda em São João da Boa Vista, com o preço comparado ao do bairro. Avaliação do seu imóvel com laudo.">
+<Base title={vitrine ? 'Wisekey Imóveis | Imóveis à venda em São João da Boa Vista com a conta aberta' : 'Wisekey Imóveis | Imobiliária em São João da Boa Vista com a conta aberta'} description={vitrine ? 'Casas, apartamentos e terrenos à venda em São João da Boa Vista, com o preço comparado ao do bairro. Avaliação do seu imóvel com laudo.' : `Preço do m² de ${bairros.length} bairros de São João da Boa Vista e avaliação do seu imóvel, grátis, com laudo pelo método comparativo.`}>
   <section class="hero">
     <div class="wrap">
       <div>
         <h1>A sua casa em São João, com a conta aberta.</h1>
+        {vitrine ? (<>
         <p class="lede">Imóveis à venda com o preço comparado ao do bairro. E a avaliação do seu imóvel, com laudo.</p>
         <form class="busca" action={u('/imoveis/')} method="get" role="search">
           <label for="b-tipo">Tipo<select id="b-tipo" name="tipo"><option value="">Todos</option><option value="casa">Casa</option><option value="apartamento">Apartamento</option><option value="terreno">Terreno</option></select></label>
@@ -39,6 +42,11 @@ const opcBairros = [...new Set(imoveis.map((i) => i.data.bairro))].sort();
           <button class="btn" type="submit">Buscar</button>
         </form>
         <p class="vende">Vai vender? <a href={u('/avaliar/')}>Avalie seu imóvel</a></p>
+        </>) : (<>
+        <p class="lede">O preço do m² de cada bairro, aberto para quem quiser ver. E a avaliação do seu imóvel, grátis, com laudo quando você precisar do número exato.</p>
+        <div class="btns" style="margin-top:28px"><a class="btn" href={u('/avaliar/')}>Avaliar meu imóvel</a><a class="btn cont" href={u('/bairros/')}>Ver o preço do meu bairro</a></div>
+        <p class="vende">Vai comprar? <a href={u('/procuro/')}>Diga o que procura</a></p>
+        </>)}
       </div>
       {capa && (
         <div class="circulo">
@@ -49,7 +57,7 @@ const opcBairros = [...new Set(imoveis.map((i) => i.data.bairro))].sort();
     </div>
   </section>
 
-  {destaque.length > 0 && (
+  {vitrine && destaque.length > 0 && (
     <section class="sec">
       <div class="wrap">
         <div class="cabeca">
@@ -62,7 +70,7 @@ const opcBairros = [...new Set(imoveis.map((i) => i.data.bairro))].sort();
     </section>
   )}
 
-  <section class="sec" style="padding-top:0">
+  {vitrine && <section class="sec" style="padding-top:0">
     <div class="wrap">
       <div class="par">
         <h2 class="titulo">O que você procura?</h2>
@@ -74,7 +82,7 @@ const opcBairros = [...new Set(imoveis.map((i) => i.data.bairro))].sort();
         ))}
       </div>
     </div>
-  </section>
+  </section>}
 
   <section class="sec cinza" id="bairros">
     <div class="wrap">

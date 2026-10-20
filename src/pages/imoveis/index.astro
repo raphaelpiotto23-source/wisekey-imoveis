@@ -1,8 +1,10 @@
 ---
 import Base from '../../layouts/Base.astro';
 import CardImovel from '../../components/CardImovel.astro';
-import { listarImoveis, TIPO, u } from '../../lib/imoveis.js';
+import { listarImoveis, TIPO, u, VITRINE_MINIMO } from '../../lib/imoveis.js';
 const imoveis = await listarImoveis();
+// Fora do menu até 3 imóveis. Quem chega por link antes disso vê o aviso e o que já está no ar.
+const vitrine = imoveis.length >= VITRINE_MINIMO;
 const bairros = [...new Set(imoveis.map((i) => i.data.bairro))].sort();
 const tipos = [...new Set(imoveis.map((i) => i.data.tipo))];
 ---
@@ -10,12 +12,15 @@ const tipos = [...new Set(imoveis.map((i) => i.data.tipo))];
   <section class="sec topo-curto">
     <div class="wrap">
       <h1 class="titulo menor">Imóveis à venda<br /><span class="it">em São João.</span></h1>
-      {imoveis.length === 0 ? (
-        <div class="vazio">
-          <h2 style="font-size:1.4rem">Os primeiros imóveis entram em breve</h2>
-          <p class="cinza-t" style="margin-top:10px">Conta o que você procura. A gente vai atrás do imóvel certo.</p>
-          <a class="btn" href={u('/procuro/')}>Dizer o que procuro</a>
-        </div>
+      {!vitrine ? (
+        <>
+          <div class="vazio">
+            <h2 style="font-size:1.4rem">{imoveis.length ? 'Os primeiros imóveis estão entrando' : 'Os primeiros imóveis entram em breve'}</h2>
+            <p class="cinza-t" style="margin-top:10px">Conta o que você procura. A gente vai atrás do imóvel certo.</p>
+            <a class="btn" href={u('/procuro/')}>Dizer o que procuro</a>
+          </div>
+          {imoveis.length > 0 && <div class="grade" style="margin-top:36px">{imoveis.map((i) => <CardImovel imovel={i} />)}</div>}
+        </>
       ) : (
         <>
           <form class="filtros" id="filtros" aria-label="Filtrar imóveis">

@@ -1,11 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
-import { u } from '../lib/imoveis.js';
+import { u, vitrineAberta } from '../lib/imoveis.js';
+const vitrine = await vitrineAberta();
 ---
 <Base title="Página não encontrada | Wisekey Imóveis" description="Página não encontrada.">
   <section class="sec topo-curto"><div class="wrap estreito">
     <h1 class="titulo menor">Essa página não existe mais.</h1>
-    <p class="lede">O imóvel pode ter sido vendido ou retirado. Veja o que está à venda agora.</p>
-    <div class="btns" style="margin-top:24px"><a class="btn" href={u('/imoveis/')}>Ver imóveis</a><a class="btn cont" href={u('/')}>Ir para o início</a></div>
+    <p class="lede">O imóvel pode ter sido vendido ou retirado. {vitrine ? 'Veja o que está à venda agora.' : 'Veja o preço do m² do seu bairro.'}</p>
+    <div class="btns" style="margin-top:24px">{vitrine ? <a class="btn" href={u('/imoveis/')}>Ver imóveis</a> : <a class="btn" href={u('/bairros/')}>Ver os bairros</a>}<a class="btn cont" href={u('/')}>Ir para o início</a></div>
   </div></section>
 </Base>

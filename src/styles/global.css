@@ -184,6 +184,14 @@ b,strong{font-weight:600}
 .ficha h2{font-weight:700;font-size:1.35rem;margin:38px 0 14px}
 .lista{padding-left:1.1em;margin:0}
 .lista li{margin-bottom:.3em}
+/* perguntas frequentes: details nativo, abre sem JavaScript */
+.faq{border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;list-style:none;padding:16px 36px 16px 0;position:relative;font-weight:600;color:var(--navy)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:6px;top:12px;font-size:1.4rem;font-weight:400;color:var(--roxo)}
+.faq details[open] summary::after{content:"\2212"}
+.faq p{margin:0 0 18px;color:var(--ink-2)}
 .carac{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .carac h3{margin:0 0 8px;font-size:.86rem;font-weight:700}
 .carac ul{list-style:none;margin:0;padding:0;font-size:.94rem}
@@ -225,7 +233,8 @@ b,strong{font-weight:600}
 /* rodapé */
 .rodape{background:var(--navy);color:#C9C2EE;padding-block:64px 32px;font-size:.88rem}
 .rodape .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:30px}
-@media (max-width:900px){.rodape .cols{grid-template-columns:1fr 1fr}}
+.rodape .cols.tres{grid-template-columns:1.4fr 1fr 1fr}
+@media (max-width:900px){.rodape .cols,.rodape .cols.tres{grid-template-columns:1fr 1fr}}
 .rodape b{color:#fff;display:block;margin-bottom:8px;font-weight:600}
 .rodape a{display:block;color:#C9C2EE;text-decoration:none;padding:6px 0}
 .rodape .base{border-top:1px solid #2C3C7A;margin-top:36px;padding-top:20px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}

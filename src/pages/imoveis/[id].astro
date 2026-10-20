@@ -4,7 +4,7 @@ import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Regua from '../../components/Regua.astro';
 import CardImovel from '../../components/CardImovel.astro';
-import { listarImoveis, brl, m2, TIPO, TIPO_PLURAL, STATUS, comparaBairro, wa, u, dadosBairro } from '../../lib/imoveis.js';
+import { listarImoveis, brl, m2, TIPO, TIPO_PLURAL, STATUS, comparaBairro, wa, u, dadosBairro, VITRINE_MINIMO } from '../../lib/imoveis.js';
 import site from '../../data/site.json';
 
 export async function getStaticPaths() {
@@ -12,6 +12,8 @@ export async function getStaticPaths() {
   return imoveis.map((imovel) => ({ params: { id: imovel.id }, props: { imovel, todos: imoveis } }));
 }
 const { imovel, todos } = Astro.props;
+// Com a vitrine fechada (menos de 3 no ar), a ficha não manda ninguém para a busca vazia.
+const vitrine = todos.length >= VITRINE_MINIMO;
 const d = imovel.data;
 const { Content } = await render(imovel);
 const c = comparaBairro(d);
@@ -33,7 +35,7 @@ const jsonld = {
       offers: { '@type': 'Offer', price: d.preco, priceCurrency: 'BRL', availability: d.status === 'vendido' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock' },
       about: { '@type': tipoSchema, name: d.titulo, floorSize: d.area_construida ? { '@type': 'QuantitativeValue', value: d.area_construida, unitCode: 'MTK' } : undefined, numberOfRooms: d.quartos ?? undefined, address: { '@type': 'PostalAddress', addressLocality: 'São João da Boa Vista', addressRegion: 'SP', addressCountry: 'BR' } } },
     { '@type': 'BreadcrumbList', itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Imóveis', item: new URL(u('/imoveis/'), raiz).href },
+      { '@type': 'ListItem', position: 1, name: vitrine ? 'Imóveis' : 'Bairros', item: new URL(u(vitrine ? '/imoveis/' : '/bairros/'), raiz).href },
       ...(b ? [{ '@type': 'ListItem', position: 2, name: b.nome, item: new URL(u(`/bairros/${b.slug}/`), raiz).href }] : []),
       { '@type': 'ListItem', position: b ? 3 : 2, name: d.titulo, item: url },
     ] },
@@ -61,7 +63,7 @@ const outros = vizinhos.length ? vizinhos : todos.filter((i) => i.id !== imovel.
   <div class="wrap">
     <div class="ficha">
       <div>
-        <div class="trilha"><a href={u('/imoveis/')}>Imóveis</a> › {b ? <a href={u(`/bairros/${b.slug}/`)}>{d.bairro}</a> : d.bairro} › {d.codigo}</div>
+        <div class="trilha">{vitrine ? <a href={u('/imoveis/')}>Imóveis</a> : <a href={u('/bairros/')}>Bairros</a>} › {b ? <a href={u(`/bairros/${b.slug}/`)}>{d.bairro}</a> : d.bairro} › {d.codigo}</div>
         <h1>{d.titulo}</h1>
         <p class="cinza-t" style="margin-top:12px">{TIPO[d.tipo]} · {d.bairro}{d.condominio_nome ? ` · ${d.condominio_nome}` : ''} · São João da Boa Vista</p>
         <div class="numeros">
@@ -108,8 +110,9 @@ const outros = vizinhos.length ? vizinhos : todos.filter((i) => i.id !== imovel.
         <h2>Continue procurando</h2>
         <div class="links">
           {b && <a href={u(`/bairros/${b.slug}/`)}>Preço do m² no {b.nome}</a>}
-          <a href={u(`/imoveis/?bairro=${encodeURIComponent(d.bairro)}`)}>Imóveis no {d.bairro}</a>
-          <a href={u(`/imoveis/?tipo=${d.tipo}`)}>{TIPO_PLURAL[d.tipo]} à venda</a>
+          {vitrine && <a href={u(`/imoveis/?bairro=${encodeURIComponent(d.bairro)}`)}>Imóveis no {d.bairro}</a>}
+          {vitrine && <a href={u(`/imoveis/?tipo=${d.tipo}`)}>{TIPO_PLURAL[d.tipo]} à venda</a>}
+          {!vitrine && <a href={u('/procuro/')}>Diga o que procura</a>}
         </div>
       </div>
 
